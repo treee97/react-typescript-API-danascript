@@ -1,9 +1,11 @@
-import { ChangeEvent, useState } from "react"
+import { ChangeEvent, useState, useEffect } from "react"
+import { optionType } from "./types"
 
 const App = (): JSX.Element => {
 //https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&exclude={part}&appid={API key}
   const [term, setTerm] = useState<string>('')
   //<string> we define that we return a string in usestate
+  const [city, setCity] = useState<optionType | null>(null);
   const [options, setOptions] = useState<[]>([])
 
   const getSearchOptions = (value:string) => {
@@ -22,6 +24,32 @@ const App = (): JSX.Element => {
     getSearchOptions(value);
   }
 
+  const getForecast = (city: optionType) => {
+    fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&units=metric&appid=${process.env.REACT_APP_API_KEY}`
+    )
+      .then((res) => res.json())
+      .then((data) => console.log({ data }))
+  }
+
+  const onSubmit = () => {
+    if (!city) return 
+    getForecast(city)
+  }
+  const onOptionSelect = (option: optionType) => {
+    setCity(option);
+    console.log(option.name)
+
+    
+  }
+  
+  useEffect(() => {
+    if (city) {
+      setTerm(city.name);
+      setOptions([]);
+    }
+  }, [city])
+
   return (
     <main className="flex justify-center items-center bg-gradient-to-br from-sky-400 via-rose-400 to-lime-400 h-[100vh] w-full">
       <section className="w-full md:max-w-[500px] p-4 flex flex-col text-center items-center justify-center md:px-10 lg:p-24 h-full lg:h-[500px] bg-white bg-opacity-20 backdrop-blur-ls rounded drop-shadow-lg text-zinc-700">
@@ -35,11 +63,17 @@ const App = (): JSX.Element => {
             className="px-2 py-1 rounded-l-md border-2 border-white"
             onChange={onInputChange}
           />
-          <ul className="absolute top-9 bg-white ml-1 rounded-b-md">
-            {options.map((option: {name: string}) => <p>{option.name}</p>)}
+          <ul className="absolute top-9 bg-white ml-1 rounded-b-md"> 
+            {options.map((option: optionType, index: number) => (
+            <li key={option.name + '-' + index}>
+              <button className="text-left text-sm w-full hover:bg-zinc-700 hover:text-white px-2 py-1 cursor-pointer" onClick={() => onOptionSelect(option)}>
+                {option.name}
+              </button>
+            </li>
+            ))}
           </ul>
 
-          <button className="rounded-r-md border-2 border-zinc-100 hover:border-zinc-500 hover:text-zinc-500 text-zinc-100 px-2 py-1 cursor-pointer">Search</button>
+          <button className="rounded-r-md border-2 border-zinc-100 hover:border-zinc-500 hover:text-zinc-500 text-zinc-100 px-2 py-1 cursor-pointer" onClick={onSubmit}>Search</button>
         </div>
       </section>
     </main>
