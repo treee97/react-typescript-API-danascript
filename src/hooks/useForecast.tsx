@@ -7,7 +7,7 @@ const useForecast = () => {
   //<string> we define that we return a string in usestate
   const [city, setCity] = useState<optionType | null>(null)
   const [options, setOptions] = useState<[]>([])
-  const [forecast, setForecast] = useState<setForecast | null>(null)
+  const [forecast, setForecast] = useState<forecastType | null>(null)
 
   const getSearchOptions = (value: string) => {
     fetch(
@@ -33,7 +33,15 @@ const useForecast = () => {
       `https://api.openweathermap.org/data/2.5/forecast?lat=${city.lat}&lon=${city.lon}&units=metric&appid=${process.env.REACT_APP_API_KEY}`
     )
       .then((res) => res.json())
-      .then((data) => setForecast(data))
+      .then((data) => {
+        
+        const forecastData = {
+          ...data.city,
+          list: data.list.slice(0, 16)
+        }
+        
+        setForecast(forecastData)}
+        )
   }
 
   const onSubmit = () => {
