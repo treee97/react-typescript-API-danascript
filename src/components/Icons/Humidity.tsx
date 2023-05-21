@@ -1,4 +1,4 @@
-const aTest = (): JSX.Element => (
+const Humidity = (): JSX.Element => (
   <svg
     width="15"
     height="15"
@@ -16,4 +16,4 @@ const aTest = (): JSX.Element => (
   </svg>
 )
 
-export default aTest
+export default Humidity
